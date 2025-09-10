@@ -1,15 +1,298 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillRush</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0e121a;
+            color: #e2e8f0;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #6366f1;
+        }
+        .btn-primary-custom {
+            background-color: #6366f1;
+            border-color: #6366f1;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-primary-custom:hover {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.7);
+        }
+        .card-custom {
+            background-color: #1a202c;
+            border-color: #2d3748;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease-in-out;
+        }
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        .hero-background {
+            background-image: url('https://placehold.co/1920x1080/0f172a/94a3b8?text=Futuristic+Landscape');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .hero-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(8px);
+            background-color: rgba(14, 18, 26, 0.7);
+        }
+        @keyframes rocket-fly {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        #rocket-svg {
+            animation: rocket-fly 3s ease-in-out infinite;
+        }
+        .rounded-circle-icon {
+            width: 4rem;
+            height: 4rem;
+            background-color: #6366f1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+        }
+        #hero-frame {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: block;
+        }
+      
+
+    </style>
 </head>
 <body>
-    <p>hi</p>
-    <button>Home </button>
-    <button>Home </button>
-    <button>Home </button>
-     
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
+            <div class="container-fluid container">
+              <a class="navbar-brand fs-3 fw-bold" href="#">
+                Skill 
+                <img src="/images/aaaaa.png" alt="Sword" style="height: 1.5em; vertical-align: middle; margin: 0 0.3em;">
+                <span style="color: #6366f1;">Rush</span>
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                  <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/home">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/courses">Courses</a>
+                  </li>
+                  <li class="nav-item ms-lg-3" id="nav-login-or-profile">
+                    <!-- This will be replaced by JS -->
+                    <a href="/login" class="btn btn-primary-custom rounded-pill fw-bold px-4 py-2">Login</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+                    
+    </header>
+
+    <!-- Main Section -->
+    <section class="hero-background text-white position-relative text-center py-5 py-md-5 d-flex align-items-center justify-content-center" style="height: 80vh;">
+        <div class="container position-relative z-1">
+            <h1 class="display-3 fw-bold mb-3">Accelerate Your Learning, Master Your Skills</h1>
+            <p class="lead mb-4 mx-auto" style="max-width: 600px;">
+                Dive into a world of knowledge with gamified courses, interactive challenges, and a vibrant community.
+            </p>
+            <div class="mt-4 mb-5" style="width: 150px; height: 150px; margin: 0 auto;">
+                <canvas id="hero-frame"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Cards Section -->
+    <section class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-white">Why Choose SkillRush?</h2>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                We're more than just a platform; we're your partner in skill mastery.
+            </p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <!-- Card 1 -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card card-custom h-100 rounded-4 p-4 text-center">
+                    <div class="rounded-circle-icon mx-auto mb-3">
+                         <canvas id="frame"></canvas>
+                    </div>
+                    <div class="card-body p-0">
+                        <h5 class="card-title fw-bold mb-2 text-white">Interactive Learning</h5>
+                        <p class="card-text text-secondary">
+                            Engage with hands-on projects and real-time coding exercises to build skills that stick.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card card-custom h-100 rounded-4 p-4 text-center">
+                    <div class="rounded-circle-icon mx-auto mb-3">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.5 3-9s-1.343-9-3-9m0 18a9 9 0 009-9m-9 9c-1.657 0-3-4.5-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                        </svg>
+                    </div>
+                    <div class="card-body p-0">
+                        <h5 class="card-title fw-bold mb-2 text-white">Gamified Experience</h5>
+                        <p class="card-text text-secondary">
+                            Earn points, unlock achievements, and compete with friends to make learning fun and rewarding.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card card-custom h-100 rounded-4 p-4 text-center">
+                    <div class="rounded-circle-icon mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m3-8a4 4 0 118 0" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+                        </svg>
+                    </div>
+                    <div class="card-body p-0">
+                        <h5 class="card-title fw-bold mb-2 text-white">Expert-Led Courses</h5>
+                        <p class="card-text text-secondary">
+                            Learn from industry professionals with courses designed to meet the demands of today's market.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 4 -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card card-custom h-100 rounded-4 p-4 text-center">
+                    <div class="rounded-circle-icon mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5h-2a2 2 0 01-2-2v-4a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2zM5 16h6m-6 4h6m-6 4h6" />
+                        </svg>
+                    </div>
+                    <div class="card-body p-0">
+                        <h5 class="card-title fw-bold mb-2 text-white">Community Support</h5>
+                        <p class="card-text text-secondary">
+                            Connect with a global network of learners and mentors to get help and share your progress.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Us Form -->
+    <section class="container py-5">
+        <div class="card card-custom rounded-4 p-4 p-md-5 mx-auto" style="max-width: 800px;">
+            <h2 class="display-5 fw-bold text-center text-white mb-2">Get in Touch</h2>
+            <p class="text-center text-secondary mb-4">
+                We'd love to hear from you. Fill out the form below and we'll get back to you soon.
+            </p>
+            <form action="#" method="POST" class="row g-4">
+                <div class="col-12">
+                    <label for="name" class="form-label text-white">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Your Name">
+                </div>
+                <div class="col-12">
+                    <label for="email" class="form-label text-white">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Your Email">
+                </div>
+                <div class="col-12">
+                    <label for="message" class="form-label text-white">Message</label>
+                    <textarea id="message" name="message" rows="4" class="form-control" placeholder="Your Message"></textarea>
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary-custom rounded-pill fw-bold px-5 py-3 mt-3">
+                        Send Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4" style="border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem;">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 SkillRush. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script>
+        const username = sessionStorage.getItem("loggedInUser");
+        if (username) {
+            setTimeout(() => {
+                alert(`Welcome, ${username}!`);
+                sessionStorage.removeItem("loggedInUser");
+            }, 100);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          const loggedInUser = sessionStorage.getItem("loggedInUser");
+          const navLoginOrProfile = document.getElementById("nav-login-or-profile");
+      
+          if (loggedInUser) {
+            // Replace the login button with the profile button
+            navLoginOrProfile.innerHTML = `
+              <div class="dropdown">
+                <button class="btn btn-primary-custom rounded-pill fw-bold px-4 py-2 dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  ${loggedInUser}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                  <li><a class="dropdown-item" href="/dashboard">Dashboard</a></li>
+                  <li><a class="dropdown-item" href="#" id="logout-btn">Logout</a></li>
+                </ul>
+              </div>
+            `;
+      
+            // Logout functionality
+            document.getElementById("logout-btn").addEventListener("click", () => {
+              sessionStorage.removeItem("loggedInUser");
+              window.location.reload();
+            });
+          }
+        });
+    </script>  
+    
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
 </body>
 </html>
+
+
+

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamified Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #111827;
+            color: #d1d5db;
+        }
+        .container-card {
+            background-color: #1f2937;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="container-card max-w-2xl w-full mx-auto p-8 rounded-2xl">
+        <!-- Header -->
+        <div class="flex items-center space-x-4 mb-8">
+            <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-xl font-bold text-gray-300">
+                JL
+            </div>
+            <div>
+                <h1 class="text-3xl font-extrabold text-white">Jessica Lopez</h1>
+                <p class="text-gray-400">Pro Explorer</p>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 text-center">
+            <div class="bg-gray-700 p-6 rounded-xl flex flex-col items-center">
+                <span class="text-4xl font-extrabold text-white" id="score">1,250</span>
+                <span class="text-gray-400 font-medium">Points</span>
+            </div>
+            <div class="bg-gray-700 p-6 rounded-xl flex flex-col items-center">
+                <span class="text-4xl font-extrabold text-white" id="level">5</span>
+                <span class="text-gray-400 font-medium">Level</span>
+            </div>
+        </div>
+
+        <!-- Level Progress -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-white mb-2">Level Up Progress</h3>
+            <div class="w-full bg-gray-700 rounded-full h-4 relative">
+                <div id="progress-bar" class="bg-purple-500 h-4 rounded-full transition-all duration-700 ease-out" style="width: 50%;"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-sm text-gray-400">
+                <span id="current-score-progress">250</span>
+                <span>/ 500 points</span>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-white mb-4">Achievements</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div class="bg-gray-700 p-4 rounded-xl text-center flex flex-col items-center">
+                    <span class="text-3xl mb-2">🏆</span>
+                    <span class="text-sm font-medium">First Quest</span>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-xl text-center flex flex-col items-center">
+                    <span class="text-3xl mb-2">🌟</span>
+                    <span class="text-sm font-medium">Trailblazer</span>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-xl text-center flex flex-col items-center">
+                    <span class="text-3xl mb-2">🥇</span>
+                    <span class="text-sm font-medium">Top Scorer</span>
+                </div>
+                <div class="bg-gray-700 p-4 rounded-xl text-center flex flex-col items-center">
+                    <span class="text-3xl mb-2">✨</span>
+                    <span class="text-sm font-medium">Cosmic Spark</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Button -->
+        <div class="text-center">
+            <button id="add-points-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 transition-colors duration-300 transform hover:scale-105 active:scale-95">
+                Earn Points
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scoreEl = document.getElementById('score');
+            const levelEl = document.getElementById('level');
+            const progressBar = document.getElementById('progress-bar');
+            const currentScoreProgressEl = document.getElementById('current-score-progress');
+            const addPointsBtn = document.getElementById('add-points-btn');
+
+            let currentScore = 1250;
+            let currentLevel = 5;
+            const pointsToNextLevel = 500;
+            let currentLevelProgress = 250;
+
+            const updateUI = () => {
+                scoreEl.textContent = currentScore.toLocaleString();
+                levelEl.textContent = currentLevel;
+                currentScoreProgressEl.textContent = currentLevelProgress;
+                
+                const progressPercentage = (currentLevelProgress / pointsToNextLevel) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            };
+
+            const addPoints = () => {
+                const pointsToAdd = Math.floor(Math.random() * 100) + 10;
+                currentScore += pointsToAdd;
+                currentLevelProgress += pointsToAdd;
+
+                if (currentLevelProgress >= pointsToNextLevel) {
+                    currentLevel += 1;
+                    currentLevelProgress = currentLevelProgress % pointsToNextLevel;
+                    // In a real app, you would save progress and maybe grant an achievement
+                    console.log(`Congratulations! You've reached Level ${currentLevel}!`);
+                }
+
+                updateUI();
+            };
+
+            addPointsBtn.addEventListener('click', addPoints);
+            updateUI(); // Initial UI update
+        });
+    </script>
+</body>
+</html>

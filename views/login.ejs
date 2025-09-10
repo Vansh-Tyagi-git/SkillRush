@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillRush Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0e121a;
+            color: #e2e8f0;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #6366f1;
+        }
+        .btn-primary-custom {
+            background-color: #6366f1;
+            border-color: #6366f1;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-primary-custom:hover {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.7);
+        }
+        .card-custom {
+            background-color: #1a202c;
+            border-color: #2d3748;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease-in-out;
+        }
+        .form-control-custom {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        .form-control-custom::placeholder {
+            color: #a0aec0;
+        }
+        .form-control-custom:focus {
+            background-color: #2d3748;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+            color: #e2e8f0;
+        }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('https://placehold.co/1920x1080/0e121a/6366f1?text=Login+Background');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(8px);
+            background-color: rgba(14, 18, 26, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
+            <div class="container-fluid container">
+                <a class="navbar-brand fs-3 fw-bold d-flex align-items-center gap-2" href="index.html">
+    
+    Skill<span style="color: #6366f1;">Rush</span>
+</a>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Courses</a>
+                        </li>
+                        <li class="nav-item ms-lg-3">
+                            <a href="login.html" class="btn btn-primary-custom rounded-pill fw-bold px-4 py-2">
+                                Login
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Form Section -->
+    <section class="login-container">
+        <div class="card card-custom rounded-4 p-4 p-md-5 mx-auto position-relative z-1" style="max-width: 450px;">
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-white mb-2">Login to SkillRush</h2>
+                <p class="text-secondary">Enter your credentials to continue your journey.</p>
+            </div>
+            <form id="loginForm">
+                <div class="col-12">
+                    <label for="username" class="form-label text-white">Username or Email</label>
+                    <input type="text" id="username" name="username" class="form-control form-control-custom rounded-pill px-4" placeholder="Enter your username or email">
+                </div>
+                <div class="col-12">
+                    <label for="password" class="form-label text-white">Password</label>
+                    <input type="password" id="password" name="password" class="form-control form-control-custom rounded-pill px-4" placeholder="Enter your password">
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary-custom rounded-pill fw-bold px-5 py-3 mt-3 w-100">
+                        Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script>
+        const form = document.getElementById("loginForm");
+    
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+    
+            const username = form.username.value;
+            const password = form.password.value;
+    
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ username, password })
+            });
+    
+            const result = await response.json();
+    
+            if (result.success) {
+                sessionStorage.setItem("loggedInUser", result.username);
+                // ✅ Redirect immediately
+                window.location.href = "/home";
+            } else {
+                // ❌ This alert is OK here because it's an error
+                alert(result.message);
+            }
+        });
+    </script>
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
