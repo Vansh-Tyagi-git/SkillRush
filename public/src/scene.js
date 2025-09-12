@@ -106,7 +106,7 @@ function createLevelNodes() {
     const mat = new THREE.MeshStandardMaterial({ color:
       lvl.status==='completed'?0x22C55E:
       lvl.status==='unlocked'?0xA855F7:0x9CA3AF });
-    const node = new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,0.2,32), mat);
+    const node = new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,0.5,32), mat);
     node.position.copy(pt);
     node.castShadow=true;
     node.userData = { levelId:lvl.id, status:lvl.status };
@@ -124,7 +124,7 @@ const DEG2RAD = Math.PI / 180;
 
 function setInitialPositions(levelId) {
     const point = curve.getPointAt(levelId / (TOTAL_LEVELS > 1 ? TOTAL_LEVELS - 1 : 1));
-    character.position.set(point.x, point.y + 0.8, point.z);
+    character.position.set(point.x, point.y + 1, point.z);
     
     const offset = new THREE.Vector3(0, 10, 10);
     const camPos = point.clone().add(offset);
@@ -221,7 +221,7 @@ function animate() {
     const elapsed = clock.getElapsedTime();
     const baseBob = Math.sin(elapsed * 5) * 0.05;
     const point = curve.getPointAt(currentLevelId / (TOTAL_LEVELS > 1 ? TOTAL_LEVELS - 1 : 1));
-    character.position.y = point.y + 0.8 + baseBob;
+    character.position.y = point.y + 1 + baseBob;
   }
 
   renderer.render(scene, camera);
