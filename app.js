@@ -52,3 +52,7 @@ app.get("/dashboard", (req, res) => {
 app.get("/courses", (req, res)=>{
     res.render("courses.ejs")
 })
+
+app.get("/game", (req, res) => {
+    res.render("game.ejs")
+})
