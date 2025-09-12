@@ -1,126 +1,20 @@
 import * as THREE from 'three';
-// import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // OrbitControls is no longer needed
 import { journeyData } from './quiz.js';
 import { setupQuizGUI } from './quizGUI.js';
+import { camera, updateCameraPosition, setCameraControlsEnabled, setCameraTransforms, cameraOrigin, cameraRadius, cameraElevation, cameraAzimuth } from './camera.js';
 
-// --- Basic Scene Setup (Unchanged) ---
+// --- Basic Scene Setup ---
 const canvas = document.getElementById('three-canvas');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87CEEB);
 scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
-
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-// camera.position.set(0, 10, 20); // Initial position will be set by the custom controls
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 
-// --- NEW: Custom Camera Controls ---
-const LEFT_MOUSE_BUTTON = 0;
-const MIDDLE_MOUSE_BUTTON = 1;
-const RIGHT_MOUSE_BUTTON = 2;
-
-const MIN_CAMERA_RADIUS = 5;
-const MAX_CAMERA_RADIUS = 50;
-const MIN_CAMERA_ELEVATION = 5;
-const MAX_CAMERA_ELEVATION = 85;
-const ROTATION_SENSITIVITY = 0.3;
-const ZOOM_SENSITIVITY = 0.05;
-const PAN_SENSITIVITY = -0.01;
-
-const DEG2RAD = Math.PI / 180;
-const Y_AXIS = new THREE.Vector3(0, 1, 0);
-
-let cameraOrigin = new THREE.Vector3(0, 0, 0); // The point the camera looks at.
-let cameraRadius = 20; // Distance from origin.
-let cameraAzimuth = 180; // Rotation around the Y axis in degrees.
-let cameraElevation = 25; // Angle above the XZ plane in degrees.
-
-let isLeftMouseDown = false;
-let isRightMouseDown = false;
-let isMiddleMouseDown = false;
-let prevMouseX = 0;
-let prevMouseY = 0;
-let controlsEnabled = true;
-
-function updateCameraPosition() {
-    const azimuthInRad = cameraAzimuth * DEG2RAD;
-    const elevationInRad = cameraElevation * DEG2RAD;
-
-    camera.position.x = cameraRadius * Math.sin(azimuthInRad) * Math.cos(elevationInRad);
-    camera.position.y = cameraRadius * Math.sin(elevationInRad);
-    camera.position.z = cameraRadius * Math.cos(azimuthInRad) * Math.cos(elevationInRad);
-    
-    camera.position.add(cameraOrigin);
-    camera.lookAt(cameraOrigin);
-    camera.updateMatrixWorld();
-}
-
-// Event Listeners for new controls
-window.addEventListener('mousedown', (e) => {
-    // Ignore clicks on the UI
-    if (e.target.closest('#quiz-container')) return;
-
-    if (!controlsEnabled) return;
-    if (e.button === LEFT_MOUSE_BUTTON) isLeftMouseDown = true;
-    if (e.button === MIDDLE_MOUSE_BUTTON) isMiddleMouseDown = true;
-    if (e.button === RIGHT_MOUSE_BUTTON) isRightMouseDown = true;
-    prevMouseX = e.clientX;
-    prevMouseY = e.clientY;
-});
-
-window.addEventListener('mouseup', (e) => {
-    if (e.button === LEFT_MOUSE_BUTTON) isLeftMouseDown = false;
-    if (e.button === MIDDLE_MOUSE_BUTTON) isMiddleMouseDown = false;
-    if (e.button === RIGHT_MOUSE_BUTTON) isRightMouseDown = false;
-});
-
-window.addEventListener('mousemove', (e) => {
-    if (!controlsEnabled || (!isLeftMouseDown && !isRightMouseDown && !isMiddleMouseDown)) return;
-
-    const deltaX = e.clientX - prevMouseX;
-    const deltaY = e.clientY - prevMouseY;
-
-    // Left Mouse: Pan
-    if (isLeftMouseDown) {
-        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(Y_AXIS, cameraAzimuth * DEG2RAD);
-        const left = new THREE.Vector3(1, 0, 0).applyAxisAngle(Y_AXIS, cameraAzimuth * DEG2RAD);
-        cameraOrigin.add(forward.multiplyScalar(PAN_SENSITIVITY * deltaY));
-        cameraOrigin.add(left.multiplyScalar(PAN_SENSITIVITY * deltaX));
-    }
-
-    // Middle Mouse: Zoom
-    if (isMiddleMouseDown) {
-        cameraRadius += deltaY * ZOOM_SENSITIVITY;
-        cameraRadius = Math.max(MIN_CAMERA_RADIUS, Math.min(MAX_CAMERA_RADIUS, cameraRadius));
-    }
-
-    // Right Mouse: Rotate
-    if (isRightMouseDown) {
-        cameraAzimuth += -(deltaX * ROTATION_SENSITIVITY);
-        cameraElevation += (deltaY * ROTATION_SENSITIVITY);
-        cameraElevation = Math.max(MIN_CAMERA_ELEVATION, Math.min(MAX_CAMERA_ELEVATION, cameraElevation));
-    }
-    
-    updateCameraPosition();
-    prevMouseX = e.clientX;
-    prevMouseY = e.clientY;
-});
-
-window.addEventListener('wheel', e => {
-    // Ignore wheel events on the UI
-    if (e.target.closest('#quiz-container')) return;
-
-    if (!controlsEnabled) return;
-    const delta = e.deltaY * -0.01;
-    cameraRadius += delta * (ZOOM_SENSITIVITY * 20); // scrolling is more sensitive
-    cameraRadius = Math.max(MIN_CAMERA_RADIUS, Math.min(MAX_CAMERA_RADIUS, cameraRadius));
-    updateCameraPosition();
-});
-
-
+// --- Lighting ---
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -128,6 +22,7 @@ dirLight.position.set(10, 20, 5);
 dirLight.castShadow = true;
 scene.add(dirLight);
 
+// --- Ground ---
 const ground = new THREE.Mesh(
   new THREE.PlaneGeometry(200, 200),
   new THREE.MeshLambertMaterial({ color: 0x50C878 })
@@ -136,8 +31,8 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
+// --- Character ---
 const character = new THREE.Group();
-// ... (Character creation is unchanged)
 const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16), new THREE.MeshStandardMaterial({ color: 0x9333EA }));
 body.castShadow = true; character.add(body);
 const belly = new THREE.Mesh(new THREE.CircleGeometry(0.35, 32), new THREE.MeshStandardMaterial({ color: 0xF5D0FE }));
@@ -153,7 +48,7 @@ const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.15, 4), new THREE.Mes
 beak.position.set(0, 0, 0.45); beak.rotation.x = Math.PI / 2; beak.rotation.z = Math.PI / 4; character.add(beak);
 scene.add(character);
 
-
+// --- Path and Levels ---
 function generatePathPoints(numPoints) {
     const points = [];
     const xPattern = [0, 10, 0, -10];
@@ -171,7 +66,6 @@ const curve = new THREE.CatmullRomCurve3(pathPoints);
 const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 100, 0.1, 8, false), new THREE.MeshLambertMaterial({ color: 0xFFD700 }));
 tube.receiveShadow = true;
 scene.add(tube);
-
 
 const levelObjects = [];
 const TOTAL_LEVELS = journeyData.length;
@@ -194,22 +88,25 @@ function createLevelNodes() {
 }
 createLevelNodes();
 
+// --- Game Logic & Animation ---
 let currentLevelId = 0;
 let activeTransition = null; 
+
+const DEG2RAD = Math.PI / 180;
 
 function setInitialPositions(levelId) {
     const point = curve.getPointAt(levelId / (TOTAL_LEVELS > 1 ? TOTAL_LEVELS - 1 : 1));
     character.position.set(point.x, point.y + 0.8, point.z);
     
-    cameraOrigin.copy(point);
     const offset = new THREE.Vector3(0, 10, 10);
     const camPos = point.clone().add(offset);
     
-    const relativePos = camPos.clone().sub(cameraOrigin);
-    cameraRadius = relativePos.length();
-    cameraElevation = Math.asin(relativePos.y / cameraRadius) / DEG2RAD;
-    cameraAzimuth = Math.atan2(relativePos.x, relativePos.z) / DEG2RAD;
+    const relativePos = camPos.clone().sub(point);
+    const radius = relativePos.length();
+    const elevation = Math.asin(relativePos.y / radius) / DEG2RAD;
+    const azimuth = Math.atan2(relativePos.x, relativePos.z) / DEG2RAD;
 
+    setCameraTransforms(point, radius, elevation, azimuth);
     updateCameraPosition();
 }
 
@@ -249,6 +146,7 @@ Object.defineProperty(scene, 'currentLevelId', {
 
 setInitialPositions(currentLevelId);
 
+// --- UI & Interaction ---
 const { showQuiz, quizContainer } = setupQuizGUI(journeyData, createLevelNodes, null, scene);
 
 const raycaster = new THREE.Raycaster();
@@ -265,6 +163,8 @@ window.addEventListener('click', e => {
   }
 });
 
+
+// --- Animate Loop ---
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
@@ -275,17 +175,18 @@ function animate() {
     character.position.lerpVectors(activeTransition.startCharPos, activeTransition.endCharPos, progress);
     
     // Animate the custom camera properties
-    cameraOrigin.lerpVectors(activeTransition.startOrigin, activeTransition.endOrigin, progress);
-    cameraRadius = THREE.MathUtils.lerp(activeTransition.startRadius, activeTransition.endRadius, progress);
-    cameraElevation = THREE.MathUtils.lerp(activeTransition.startElevation, activeTransition.endElevation, progress);
-    cameraAzimuth = THREE.MathUtils.lerp(activeTransition.startAzimuth, activeTransition.endAzimuth, progress);
+    const newOrigin = new THREE.Vector3().lerpVectors(activeTransition.startOrigin, activeTransition.endOrigin, progress);
+    const newRadius = THREE.MathUtils.lerp(activeTransition.startRadius, activeTransition.endRadius, progress);
+    const newElevation = THREE.MathUtils.lerp(activeTransition.startElevation, activeTransition.endElevation, progress);
+    const newAzimuth = THREE.MathUtils.lerp(activeTransition.startAzimuth, activeTransition.endAzimuth, progress);
     
+    setCameraTransforms(newOrigin, newRadius, newElevation, newAzimuth);
     updateCameraPosition();
-    controlsEnabled = false;
+    setCameraControlsEnabled(false);
 
     if (progress >= 1) {
         activeTransition = null;
-        controlsEnabled = true;
+        setCameraControlsEnabled(true);
     }
   } else {
     // Regular bobbing animation when idle
@@ -299,10 +200,11 @@ function animate() {
 }
 animate();
 
+
+// --- Resize Listener ---
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   updateCameraPosition();
 });
-
