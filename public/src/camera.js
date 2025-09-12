@@ -20,7 +20,7 @@ export const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window
 export let cameraOrigin = new THREE.Vector3(0, 0, 0); // The point the camera looks at.
 export let cameraRadius = 20; // Distance from origin.
 export let cameraAzimuth = 180; // Rotation around the Y axis in degrees.
-export let cameraElevation = 25; // Angle above the XZ plane in degrees.
+export let cameraElevation = 15; // Angle above the XZ plane in degrees.
 export let controlsEnabled = true;
 
 let isLeftMouseDown = false;
@@ -38,7 +38,10 @@ export function updateCameraPosition() {
     camera.position.z = cameraRadius * Math.cos(azimuthInRad) * Math.cos(elevationInRad);
 
     camera.position.add(cameraOrigin);
-    camera.lookAt(cameraOrigin);
+    const lookTarget = cameraOrigin.clone();
+    lookTarget.y += 5;  // shift upward by 5 units
+    camera.lookAt(lookTarget);
+
     camera.updateMatrixWorld();
 }
 

@@ -1,13 +1,35 @@
 import * as THREE from 'three';
 import { journeyData } from './quiz.js';
 import { setupQuizGUI } from './quizGUI.js';
-import { camera, updateCameraPosition, setCameraControlsEnabled, setCameraTransforms, cameraOrigin, cameraRadius, cameraElevation, cameraAzimuth } from './camera.js';
+import { 
+  camera, 
+  updateCameraPosition, 
+  setCameraControlsEnabled, 
+  setCameraTransforms, 
+  cameraOrigin, 
+  cameraRadius, 
+  cameraElevation, 
+  cameraAzimuth 
+} from './camera.js';
+import { Sky } from 'three/addons/objects/Sky.js';
 
 // --- Basic Scene Setup ---
 const canvas = document.getElementById('three-canvas');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB);
-scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
+
+
+// --- Sky ---
+const sky = new Sky();
+sky.scale.setScalar(450000);
+scene.add(sky);
+
+// Sun position setup
+const phi = THREE.MathUtils.degToRad(90);
+const theta = THREE.MathUtils.degToRad(180);
+const sunPosition = new THREE.Vector3().setFromSphericalCoords(1, phi, theta);
+
+sky.material.uniforms['sunPosition'].value.copy(sunPosition);
+
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -23,10 +45,16 @@ dirLight.castShadow = true;
 scene.add(dirLight);
 
 // --- Ground ---
+const textureLoader = new THREE.TextureLoader();
+const grassTexture = textureLoader.load('src/textures/grass.jpg');
+grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+grassTexture.repeat.set(10, 10);
+
 const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(200, 200),
-  new THREE.MeshLambertMaterial({ color: 0x50C878 })
+  new THREE.PlaneGeometry(40 , 300),
+  new THREE.MeshStandardMaterial({ map: grassTexture })
 );
+
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
