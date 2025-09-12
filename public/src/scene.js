@@ -12,6 +12,10 @@ import {
   cameraAzimuth 
 } from './camera.js';
 import { Sky } from 'three/addons/objects/Sky.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+
+
 
 // --- Basic Scene Setup ---
 const canvas = document.getElementById('three-canvas');
@@ -39,41 +43,118 @@ renderer.shadowMap.enabled = true;
 // --- Lighting ---
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
+
+// UPDATED: Configure the Directional Light for shadows
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-dirLight.position.set(10, 20, 5);
+dirLight.position.set(0, 80, -150);
 dirLight.castShadow = true;
+
+// Configure the shadow camera's view frustum
+dirLight.shadow.camera.top = 50;
+dirLight.shadow.camera.bottom = -50;
+dirLight.shadow.camera.left = -50;
+dirLight.shadow.camera.right = 50;
+dirLight.shadow.camera.near = 0.1;
+dirLight.shadow.camera.far = 500;
+
+// Optional: Increase shadow map resolution for better quality
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+
 scene.add(dirLight);
 
-// --- Ground ---
-const textureLoader = new THREE.TextureLoader();
-const grassTexture = textureLoader.load('src/textures/grass.jpg');
-grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-grassTexture.repeat.set(10, 10);
+const loader2 = new GLTFLoader();
+loader2.load('/models/grass.glb', (gltf) => {
+  gltf.scene.traverse((child) => {
+    if (child.isMesh) {
+      const material = child.material;
 
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(40 , 300),
-  new THREE.MeshStandardMaterial({ map: grassTexture })
-);
+      if (material.map) {
+        console.log("Found texture:", material.map);
 
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
+        // Enable repeating
+        material.map.wrapS = THREE.RepeatWrapping;
+        material.map.wrapT = THREE.RepeatWrapping;
+
+        // Control tiling: higher = smaller tiles, less stretched
+        material.map.repeat.set(1, 5); 
+        // X → across width (40), Y → across length (300)
+
+        const newMaterial = new THREE.MeshStandardMaterial({ map: material.map });
+
+        const ground = new THREE.Mesh(
+          new THREE.PlaneGeometry(40, 300),
+          newMaterial
+        );
+
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+      }
+    }
+  });
+});
+
+
+
 
 // --- Character ---
 const character = new THREE.Group();
-const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16), new THREE.MeshStandardMaterial({ color: 0x9333EA }));
-body.castShadow = true; character.add(body);
-const belly = new THREE.Mesh(new THREE.CircleGeometry(0.35, 32), new THREE.MeshStandardMaterial({ color: 0xF5D0FE }));
-belly.position.z = 0.48; character.add(belly);
-const eyeGroup = new THREE.Group();
-const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 8), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-leftEye.position.set(-0.17, 0.12, 0.4);
-const rightEye = leftEye.clone(); rightEye.position.x = -leftEye.position.x; eyeGroup.add(leftEye, rightEye);
-const leftPupil = new THREE.Mesh(new THREE.SphereGeometry(0.04, 16, 8), new THREE.MeshStandardMaterial({ color: 0x000000 }));
-leftPupil.position.set(-0.17, 0.12, 0.48);
-const rightPupil = leftPupil.clone(); rightPupil.position.x = -leftPupil.position.x; eyeGroup.add(leftPupil, rightPupil); character.add(eyeGroup);
-const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.15, 4), new THREE.MeshStandardMaterial({ color: 0xFBBF24 }));
-beak.position.set(0, 0, 0.45); beak.rotation.x = Math.PI / 2; beak.rotation.z = Math.PI / 4; character.add(beak);
+
+// Head: A bright yellow sphere
+const headMaterial = new THREE.MeshStandardMaterial({
+    color: 0xFFEB3B, // Classic smiley yellow
+    roughness: 0.4,
+    metalness: 0.1
+});
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.7, 64, 32), headMaterial);
+head.position.y += 1;
+character.add(head);
+
+// Eyes: Two simple, slightly squashed black spheres
+const eyeMaterial = new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    roughness: 0.2
+});
+
+const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 16), eyeMaterial);
+leftEye.position.set(-0.25, 0.2, 0.6);
+leftEye.scale.set(0.8, 1.2, 0.8); // Make them slightly oval-shaped
+const rightEye = leftEye.clone();
+rightEye.position.x = -leftEye.position.x;
+leftEye.position.y += 1;
+rightEye.position.y += 1;
+character.add(leftEye, rightEye);
+
+// Smile: Created using a segment of a TorusGeometry (a donut shape)
+const smileMaterial = new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    roughness: 0.2
+});
+// Parameters: (radius, tubeRadius, radialSegments, tubularSegments, arc)
+// The 'arc' parameter is key to making just a smile instead of a full circle.
+const smileCurve = new THREE.TorusGeometry(0.3, 0.05, 16, 100, Math.PI);
+const smile = new THREE.Mesh(smileCurve, smileMaterial);
+smile.position.set(0, -0.1, 0.55);
+smile.rotation.z = Math.PI; // Flip it upside down to form a smile
+smile.position.y += 1;
+character.add(smile);
+
+
+// --- Scaling and Shadows ---
+
+// Scale the entire character up to be a good size in the scene
+character.scale.set(1.5, 1.5, 1.5);
+
+
+// Traverse the character group to set castShadow and receiveShadow on all meshes
+character.traverse(function(child) {
+    if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true; // Allows shadows to be cast onto the smiley itself
+    }
+});
+character.position.y += 1;
 scene.add(character);
 
 // --- Path and Levels ---
@@ -90,9 +171,37 @@ function generatePathPoints(numPoints) {
 }
 
 const pathPoints = generatePathPoints(journeyData.length);
+
 const curve = new THREE.CatmullRomCurve3(pathPoints);
-const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 100, 0.1, 8, false), new THREE.MeshLambertMaterial({ color: 0xFFD700 }));
+const textureLoader2 = new THREE.TextureLoader();
+const diff = textureLoader2.load('/src/textures/diff.png');
+const nor = textureLoader2.load('/src/textures/nor.png');
+const rough = textureLoader2.load('/src/textures/rough.png');
+const ao = textureLoader2.load('/src/textures/ao.png');
+const dis = textureLoader2.load('/src/textures/dis.png');
+
+// Repeat wrapping
+[diff, nor, rough, ao, dis].forEach(tex => {
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+});
+
+const curveLength = curve.getLength();
+diff.repeat.set(curveLength / 5, 1);
+
+const material = new THREE.MeshStandardMaterial({
+  map: diff,
+  normalMap: nor,
+  roughnessMap: rough,
+  aoMap: ao,
+  displacementMap: dis,
+  displacementScale: 0.05,
+  side: THREE.DoubleSide
+});
+
+const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 100, .7, 10, false), material);
 tube.receiveShadow = true;
+tube.castShadow = true;
+tube.position.y = -.5;
 scene.add(tube);
 
 const levelObjects = [];
@@ -106,9 +215,10 @@ function createLevelNodes() {
     const mat = new THREE.MeshStandardMaterial({ color:
       lvl.status==='completed'?0x22C55E:
       lvl.status==='unlocked'?0xA855F7:0x9CA3AF });
-    const node = new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,0.5,32), mat);
+    const node = new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,0.7,32), mat);
     node.position.copy(pt);
-    node.castShadow=true;
+    node.receiveShadow = true;
+    node.castShadow = true;
     node.userData = { levelId:lvl.id, status:lvl.status };
     scene.add(node);
     levelObjects.push(node);
@@ -190,6 +300,42 @@ window.addEventListener('click', e => {
     showQuiz(hits[0].object.userData.levelId);
   }
 });
+
+// --- Load Trees ---
+const loader = new GLTFLoader();
+loader.load('/models/trees.glb', (gltf) => {
+  const treeModel = gltf.scene;
+  treeModel.traverse((child) => {
+    if (child.isMesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+
+  const trees = new THREE.Group();
+
+  // Place trees along both edges of the ground
+  const spacing = 100; // distance between trees along Z
+  for (let z = -100; z <= 100; z += spacing) {
+    // Left edge
+    const leftTree = treeModel.clone();
+    leftTree.position.set(-18, 0, z);
+    leftTree.scale.set(2, 2, 2);
+    leftTree.rotation.y = -Math.PI / 2;
+    trees.add(leftTree);
+
+    // Right edge
+    const rightTree = treeModel.clone();
+    rightTree.position.set(18, 0, z);
+    rightTree.scale.set(2, 2, 2);
+    rightTree.rotation.y = Math.PI / 2;
+    trees.add(rightTree);
+  }
+
+  scene.add(trees);
+});
+
+
 
 
 // --- Animate Loop ---
