@@ -7,6 +7,7 @@ export const journeyData = [
     quizzes: [
       {
         question: "What is the standard form of a linear equation in two variables?",
+        youtubeId: "hZ6-RHL4lB8",
         options: [
           { text: "ax + by = c", correct: true },
           { text: "ax² + bx + c = 0", correct: false },
