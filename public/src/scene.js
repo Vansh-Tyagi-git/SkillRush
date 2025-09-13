@@ -13,9 +13,11 @@ import {
 } from './camera.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-
-
+const dLoader = new DRACOLoader();
+dLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+dLoader.setDecoderConfig({type: 'js'});
 
 // --- Basic Scene Setup ---
 const canvas = document.getElementById('three-canvas');
@@ -64,6 +66,7 @@ dirLight.shadow.mapSize.height = 2048;
 scene.add(dirLight);
 
 const loader2 = new GLTFLoader();
+loader2.setDRACOLoader(dLoader);
 loader2.load('/models/grass.glb', (gltf) => {
   gltf.scene.traverse((child) => {
     if (child.isMesh) {
@@ -303,6 +306,7 @@ window.addEventListener('click', e => {
 
 // --- Load Trees ---
 const loader = new GLTFLoader();
+loader.setDRACOLoader(dLoader);
 loader.load('/models/trees.glb', (gltf) => {
   const treeModel = gltf.scene;
   treeModel.traverse((child) => {

@@ -84,7 +84,7 @@ class DwarfViewer {
 
     // Auto-rotate settings
     this.controls.autoRotate = this.options.autoRotate
-    this.controls.autoRotateSpeed = 2.0
+    this.controls.autoRotateSpeed = 20.0
 
     // Set initial camera position
     this.camera.position.set(0, 2, this.options.cameraDistance)
