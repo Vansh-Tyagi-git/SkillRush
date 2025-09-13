@@ -19,7 +19,7 @@ app.listen(5500, ()=>{
 });
 
 app.get("/", (req, res)=>{
-    res.send("root is working");
+    res.render("main.ejs");
 })
 
 app.get("/home", (req, res)=>{
