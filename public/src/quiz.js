@@ -56,7 +56,7 @@ export const journeyData = [
           { text: "y = 2x - 4", correct: false },
           { text: "y = 4 + 2x", correct: false }
         ]
-      }
+      },
     ]
   },
   {
