@@ -215,14 +215,22 @@ function createLevelNodes() {
   levelObjects.length = 0;
   journeyData.forEach((lvl,i) => {
     const pt = curve.getPointAt(i / (TOTAL_LEVELS > 1 ? TOTAL_LEVELS - 1 : 1));
-    const mat = new THREE.MeshStandardMaterial({ color:
-      lvl.status==='completed'?0x22C55E:
-      lvl.status==='unlocked'?0xA855F7:0x9CA3AF });
-    const node = new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,0.7,32), mat);
+
+    const mat = new THREE.MeshStandardMaterial({
+        color:
+            lvl.status === 'completed' ? 0x22C55E :
+            lvl.status === 'unlocked' ? 0xA855F7 : 0x9CA3AF,
+        
+        // --- Add these properties for a shiny plastic look ---
+        roughness: 0.2,  // Lower value = shinier. 0 is a perfect mirror.
+        
+    });
+
+    const node = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.7, 32), mat);
     node.position.copy(pt);
     node.receiveShadow = true;
     node.castShadow = true;
-    node.userData = { levelId:lvl.id, status:lvl.status };
+    node.userData = { levelId: lvl.id, status: lvl.status };
     scene.add(node);
     levelObjects.push(node);
   });
